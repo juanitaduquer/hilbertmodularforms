@@ -14,7 +14,7 @@ Multiplication
 CreationofHMFS
 {  
    Basis.m
-   Newforms.m
+   Cuspforms.m
    EisensteinSeries.m
    ThetaSeries.m
    Recognize.m
