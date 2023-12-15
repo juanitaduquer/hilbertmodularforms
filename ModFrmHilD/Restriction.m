@@ -111,7 +111,7 @@ intrinsic RestrictionToModularForm(f::ModFrmHilDElt,M::ModFrmHilDGRng,bb::RngQua
       denom := Lcm(denom, Denominator(coeffNu));
     end for;
     restriction +:= coefficient*q^(Integers()!(j*t0));
-    prec +:= Integers()!(j*t0);
+    prec := Integers()!(j*t0);
   end for;
   modForms := ModularForms(Gamma0(level),&+[k : k in weight]);
   return modForms!(denom*(restriction +O(q^(prec))));
