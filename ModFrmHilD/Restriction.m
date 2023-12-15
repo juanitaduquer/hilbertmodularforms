@@ -17,7 +17,7 @@ intrinsic RestrictionToDiagonal(f::ModFrmHilDElt,M::ModFrmHilDGRng,bb::RngQuadId
   denom := 1;
   b := Integers()!(Denominator(bb)^(-1)*Generator((Denominator(bb)*bb) meet Integers()));
   prec := 0;
-  for j in [0 .. Precision(fbb)] do 
+  for j in [0 .. Precision(fbb)] do
     tracej := PositiveElementsOfTrace(bb*D^(-1),j);
     coefficient := 0;
     for nu in tracej do
@@ -74,3 +74,45 @@ intrinsic PositiveElementsOfTrace(aa::RngOrdFracIdl, t::RngIntElt) -> SeqEnum[Rn
 end intrinsic;
 
 
+intrinsic RestrictionToModularForm(f::ModFrmHilDElt,M::ModFrmHilDGRng,bb::RngQuadIdl,lambda::RngQuadElt) -> .
+  {Given an HMF f over a quadratic field with weights [k1,k2], returns the elliptic
+  modular curve of weight k1+k2 and level L.  This form is obtained from restricting
+  the component bb of the HMF to a Hirzebruch--Zagier divisor.}
+
+  require #Weight(f) eq 2: "Only defined for quadratic fields.";
+  require lambda in bb^(-1): "The element lambda must be in bb^(-1)";
+  F := M`BaseField;
+  ZF := Integers(F);
+  C := BaseField(F);
+  R<q> := PowerSeriesRing(C);
+  restriction := R!0;
+  NN := Level(f);
+  b := Integers()!(Denominator(bb)^(-1)*Generator((Denominator(bb)*bb) meet Integers()));
+  bbLambda := Conjugate(lambda)*bb^(-1);
+  t0 := Rationals()!(Denominator(bbLambda)^(-1)*Generator((Denominator(bbLambda)*bbLambda) meet Integers()));
+  print "we have t0 = %o", t0;
+  level := Integers()!(t0*Generator(lambda*bb*NN meet Integers()));
+  D := Different(ZF);
+  weight :=  Weight(f);
+  fbb := f`Components[bb];
+  // modForms only accepts integer coefficients
+  denom := 1;
+  prec := 0;
+  for j in [0 .. Precision(fbb)] do
+    tracej := PositiveElementsOfTrace(bb*D^(-1),j);
+    coefficient := 0;
+    for nu in tracej do
+      nuRed := FunDomainRep(M, bb, nu);
+      has_nuRed, coeffNu := IsDefined(Coefficients(fbb), nuRed);
+      if not has_nuRed then
+        break j;
+      end if;
+      coefficient +:= coeffNu;
+      denom := Lcm(denom, Denominator(coeffNu));
+    end for;
+    restriction +:= coefficient*q^(Integers()!(j*t0));
+    prec +:= Integers()!(j*t0);
+  end for;
+  modForms := ModularForms(Gamma0(level),&+[k : k in weight]);
+  return modForms!(denom*(restriction +O(q^(prec))));
+end intrinsic;
