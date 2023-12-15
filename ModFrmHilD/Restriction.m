@@ -102,7 +102,7 @@ intrinsic RestrictionToModularForm(f::ModFrmHilDElt,M::ModFrmHilDGRng,bb::RngQua
     tracej := PositiveElementsOfTrace(bb*D^(-1),j);
     coefficient := 0;
     for nu in tracej do
-      nuRed := FunDomainRep(M, bb, nu);
+      nuRed := FunDomainRep(M, bb, nu/lambda);
       has_nuRed, coeffNu := IsDefined(Coefficients(fbb), nuRed);
       if not has_nuRed then
         break j;
@@ -114,5 +114,5 @@ intrinsic RestrictionToModularForm(f::ModFrmHilDElt,M::ModFrmHilDGRng,bb::RngQua
     prec := Integers()!(j*t0);
   end for;
   modForms := ModularForms(Gamma0(level),&+[k : k in weight]);
-  return modForms!(denom*(restriction +O(q^(prec))));
+  return modForms!(denom*(restriction + O(q^(prec))));
 end intrinsic;
